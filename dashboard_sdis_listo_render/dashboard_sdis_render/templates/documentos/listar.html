@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="table-header">
+    <h2 style="color: #2c3e50; font-size: 24px; font-weight: 700; margin: 0;">
+        📄 Documentos de {{ nino.nombre_completo }}
+    </h2>
+    <div>
+        <a href="{{ url_for('subir_documento', nino_id=nino.id) }}" class="btn-primary">+ Subir Documento</a>
+        <a href="{{ url_for('ver_matricula', id=nino.id) }}" class="btn-primary" style="background: #6c757d;">← Volver</a>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tipo de Documento</th>
+                <th>Nombre Archivo</th>
+                <th>Fecha Subida</th>
+                <th>Fecha Vencimiento</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in documentos %}
+            <tr>
+                <td>{{ doc.id }}</td>
+                <td><strong>{{ doc.tipo_documento }}</strong></td>
+                <td>{{ doc.nombre_archivo[:40] }}{% if doc.nombre_archivo|length > 40 %}...{% endif %}</td>
+                <td>{{ doc.fecha_subida }}</td>
+                <td class="{% if doc.fecha_vencimiento and doc.fecha_vencimiento < doc.fecha_subida %}text-danger{% endif %}">
+                    {{ doc.fecha_vencimiento or 'N/A' }}
+                </td>
+                <td>
+                    <a href="{{ url_for('ver_documento', doc_id=doc.id) }}" class="btn-icon btn-view" target="_blank">👁️ Ver</a>
+                    <a href="{{ url_for('eliminar_documento', doc_id=doc.id) }}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar este documento?')">🗑️</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    📭 No hay documentos subidos para este niño.
+                    <a href="{{ url_for('subir_documento', nino_id=nino.id) }}">Subir el primer documento</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .btn-icon {
+        display: inline-block;
+        padding: 6px 12px;
+        margin: 0 4px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    .btn-view {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    .text-danger {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #3b82f6;
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .table-wrapper {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .data-table th {
+        background: #f8fafc;
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .data-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+</style>
+{% endblock %}

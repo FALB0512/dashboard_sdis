@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDIS Dashboard Premium | Jardines Infantiles Ciudad Bolívar</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .alert {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            border-left: 4px solid #27ae60;
+        }
+
+        .alert-error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .alert-warning {
+            border-left: 4px solid #f39c12;
+        }
+
+        .alert-info {
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Premium -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="{{ url_for('static', filename='img/logo2.png') }}" alt="Logo SDIS"
+                    style="width: 130px; height: auto; margin-bottom: -0px;">
+                <div class="logo-icon"></div>
+
+                <p>Organizando la infancia en un mundo digital</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="{{ url_for('dashboard') }}" class="nav-link"><span class="nav-icon">📊</span> Dashboard</a></li>
+                <li class="nav-item"><a href="{{ url_for('listar_jardines') }}" class="nav-link"><span class="nav-icon">🏡</span> Jardines</a></li>
+                <li class="nav-item"><a href="{{ url_for('listar_matriculas') }}" class="nav-link"><span class="nav-icon">📝</span> Matrículas</a></li>
+                {% if not role_is('asistente') %}<li class="nav-item"><a href="{{ url_for('listar_personal') }}" class="nav-link"><span class="nav-icon">👥</span> Personal</a></li>{% endif %}
+                <li class="nav-item"><a href="{{ url_for('comunicaciones') }}" class="nav-link"><span class="nav-icon">📢</span> Comunicaciones</a></li>
+                <li class="nav-item"><a href="{{ url_for('pqrs') }}" class="nav-link"><span class="nav-icon">📩</span> PQRS</a></li>
+                {% if role_is('superadmin','admin') %}<li class="nav-item"><a href="{{ url_for('usuarios') }}" class="nav-link"><span class="nav-icon">⚙️</span> Usuarios</a></li>{% endif %}
+                {% if role_is('superadmin','admin','auditor') %}<li class="nav-item"><a href="{{ url_for('auditoria') }}" class="nav-link"><span class="nav-icon">🛡️</span> Auditoría</a></li>{% endif %}
+                <li class="nav-item"><a href="{{ url_for('cambiar_password') }}" class="nav-link"><span class="nav-icon">🔐</span> Contraseña</a></li>
+                <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link"><span class="nav-icon">🚪</span> Cerrar sesión</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Premium -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>✨ Dashboard de Administración ✨</h1>
+                    <p>Jardines Infantiles SDIS · Ciudad Bolívar · Control en Tiempo Real</p>
+                </div>
+                <div class="date-box"><div style="font-weight:700">👤 {{ current_user.nombre_completo }}<br><small>{{ ROLE_LABELS[current_user.rol] }}</small></div>
+                    <div class="date-main">📅 <span id="current-date"></span></div>
+                    <a href="#" class="date-link">Ver calendario →</a>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Obtener la fecha actual
+        const currentDate = new Date();
+
+        // Opciones para el formato de la fecha
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+
+        // Formatear la fecha de acuerdo a las opciones
+        const formattedDate = currentDate.toLocaleDateString('es-ES', options);
+
+        // Mostrar la fecha formateada en el HTML
+        document.getElementById('current-date').textContent = formattedDate;
+    </script>
+
+
+
+
+
+</body>
+
+</html>

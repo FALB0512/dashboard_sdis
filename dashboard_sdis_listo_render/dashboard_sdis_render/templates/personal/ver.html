@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-header">
+        <h2>👤 Detalle del Empleado</h2>
+        <div>
+            <div class="action-buttons">
+    <a href="{{ url_for('listar_documentos_personal', personal_id=persona.id) }}" class="btn-documents">
+        <span class="btn-icon">📄</span>
+        <span class="btn-text">Documentos</span>
+        {% if documentos_count > 0 %}
+        <span class="btn-badge">{{ documentos_count }}</span>
+        {% endif %}
+    </a>
+    <a href="{{ url_for('editar_personal', id=persona.id) }}" class="btn-edit">
+        <span class="btn-icon">✏️</span>
+        <span class="btn-text">Editar</span>
+    </a>
+    <a href="{{ url_for('listar_personal') }}" class="btn-back">
+        <span class="btn-icon">←</span>
+        <span class="btn-text">Volver</span>
+    </a>
+</div>
+        </div>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-section">
+            <h3>📋 Información Personal</h3>
+            <div class="detail-grid">
+                <div><strong>Nombre:</strong> {{ persona.nombre_completo }}</div>
+                <div><strong>Documento:</strong> {{ persona.documento_identidad }}</div>
+                <div><strong>Tipo documento:</strong> {{ persona.tipo_documento }}</div>
+                <div><strong>Fecha nacimiento:</strong> {{ persona.fecha_nacimiento or 'N/A' }}</div>
+                <div><strong>Género:</strong> {{ persona.genero or 'N/A' }}</div>
+                <div><strong>Teléfono:</strong> {{ persona.telefono or 'N/A' }}</div>
+                <div><strong>Email:</strong> {{ persona.email or 'N/A' }}</div>
+                <div><strong>Dirección:</strong> {{ persona.direccion or 'N/A' }}</div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>💼 Información Laboral</h3>
+            <div class="detail-grid">
+                <div><strong>Cargo:</strong> {{ persona.cargo }}</div>
+                <div><strong>Especialidad:</strong> {{ persona.especialidad or 'N/A' }}</div>
+                <div><strong>Jardín asignado:</strong> {{ persona.jardin_nombre }}</div>
+                <div><strong>Fecha contratación:</strong> {{ persona.fecha_contratacion }}</div>
+                <div><strong>Salario:</strong> ${{ "{:,.0f}".format(persona.salario|float) if persona.salario else 'N/A' }}</div>
+                <div><strong>Horario:</strong> {{ persona.horario or 'N/A' }}</div>
+                <div><strong>Estado:</strong> <span class="status-badge">{{ persona.estado }}</span></div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>🏥 Seguridad Social</h3>
+            <div class="detail-grid">
+                <div><strong>EPS:</strong> {{ persona.eps or 'N/A' }}</div>
+                <div><strong>ARL:</strong> {{ persona.arl or 'N/A' }}</div>
+                <div><strong>Fondo de Pensiones:</strong> {{ persona.fondo_pension or 'N/A' }}</div>
+            </div>
+        </div>
+
+        {% if persona.observaciones %}
+        <div class="detail-section">
+            <h3>📝 Observaciones</h3>
+            <p>{{ persona.observaciones }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .detail-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    .detail-header h2 {
+        color: #2c3e50;
+        margin: 0;
+    }
+    .detail-card {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .detail-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .detail-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .detail-section h3 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #d1fae5;
+        color: #065f46;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .btn-edit {
+        background: #f59e0b;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 10px;
+        margin-right: 10px;
+        display: inline-block;
+    }
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 10px;
+    }
+     .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-documents, .btn-edit, .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+    
+    .btn-documents {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+    }
+    
+    .btn-documents:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+    }
+    
+    .btn-edit {
+        background: #f59e0b;
+        color: white;
+        box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+    }
+    
+    .btn-edit:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+    }
+    
+    .btn-back {
+        background: #64748b;
+        color: white;
+    }
+    
+    .btn-back:hover {
+        background: #475569;
+        transform: translateY(-2px);
+    }
+    
+    .btn-icon {
+        font-size: 16px;
+    }
+    
+    .btn-text {
+        font-size: 14px;
+    }
+    
+    .btn-badge {
+        background: rgba(255,255,255,0.25);
+        border-radius: 20px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 4px;
+    }
+    
+    /* Versión simplificada si prefieres menos efectos */
+    .btn-documents-simple {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #3b82f6;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .btn-documents-simple:hover {
+        background: #2563eb;
+    }
+</style>
+{% endblock %}

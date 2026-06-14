@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <div>
+            <h2>📤 Subir Documento</h2>
+            <p class="employee-name">{{ persona.nombre_completo }}</p>
+        </div>
+        <a href="{{ url_for('listar_documentos_personal', personal_id=persona.id) }}" class="btn-back">
+            ← Volver
+        </a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>📄 Tipo de Documento *</label>
+            <select name="tipo_documento" required>
+                <option value="">Seleccionar tipo</option>
+                {% for tipo in tipos_documento %}
+                <option value="{{ tipo }}">{{ tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>📎 Archivo *</label>
+            <input type="file" name="archivo" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+            <small>Formatos permitidos: PDF, JPG, PNG, DOC (Max 16MB)</small>
+        </div>
+
+        <div class="form-group">
+            <label>📅 Fecha de Vencimiento (opcional)</label>
+            <input type="date" name="fecha_vencimiento">
+            <small>Ej: Fecha de vencimiento de cédula, certificados, etc.</small>
+        </div>
+
+        <div class="form-group">
+            <label>📝 Observaciones</label>
+            <textarea name="observaciones" rows="3" placeholder="Información adicional sobre el documento..."></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">📤 Subir Documento</button>
+            <a href="{{ url_for('listar_documentos_personal', personal_id=persona.id) }}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eef2f6;
+    }
+    
+    .form-header h2 {
+        color: #1a2c3e;
+        margin: 0 0 6px 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+    
+    .employee-name {
+        color: #5a6e7c;
+        margin: 0;
+        font-size: 14px;
+    }
+    
+    /* Botón Volver mejorado */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f1f5f9;
+        color: #475569;
+        padding: 8px 18px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .btn-back:hover {
+        background: #e2e8f0;
+        transform: translateX(-2px);
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1a2c3e;
+        font-size: 14px;
+    }
+    
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14px;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+    
+    .form-group input:focus, 
+    .form-group select:focus, 
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    
+    .form-group small {
+        display: block;
+        margin-top: 6px;
+        color: #8ba0ac;
+        font-size: 12px;
+    }
+    
+    textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #eef2f6;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 12px 28px;
+        border-radius: 40px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+    
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 12px 28px;
+        border-radius: 40px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 500;
+        font-size: 14px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+</style>
+{% endblock %}

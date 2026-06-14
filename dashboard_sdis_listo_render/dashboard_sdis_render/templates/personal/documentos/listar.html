@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header-section">
+    <h2>📄 Documentos de {{ persona.nombre_completo }}</h2>
+    <div class="header-buttons">
+        <a href="{{ url_for('subir_documento_personal', personal_id=persona.id) }}" class="btn-primary">+ Subir Documento</a>
+        <a href="{{ url_for('ver_personal', id=persona.id) }}" class="btn-secondary">← Volver al Perfil</a>
+    </div>
+</div>
+
+<div class="stats-summary">
+    <div class="stat-card-mini">
+        <span class="stat-icon">📄</span>
+        <span class="stat-number">{{ documentos|length }}</span>
+        <span class="stat-label">Documentos subidos</span>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Tipo de Documento</th>
+                <th>Nombre Archivo</th>
+                <th>Fecha Subida</th>
+                <th>Fecha Vencimiento</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in documentos %}
+            <tr class="{% if doc.fecha_vencimiento and doc.fecha_vencimiento < today %}expired{% endif %}">
+                <td><strong>{{ doc.tipo_documento }}</strong></td>
+                <td>{{ doc.nombre_archivo[:40] }}{% if doc.nombre_archivo|length > 40 %}...{% endif %}</td>
+                <td>{{ doc.fecha_subida }}</td>
+                <td class="{% if doc.fecha_vencimiento and doc.fecha_vencimiento < today %}text-danger{% endif %}">
+                    {{ doc.fecha_vencimiento or 'Sin vencimiento' }}
+                    {% if doc.fecha_vencimiento and doc.fecha_vencimiento < today %}
+                        <span class="badge-expired">Vencido</span>
+                    {% elif doc.fecha_vencimiento %}
+                        <span class="badge-valid">Vigente</span>
+                    {% endif %}
+                </td>
+                <td><span class="status-badge">{{ doc.estado }}</span></td>
+                <td>
+                    <a href="{{ url_for('ver_documento_personal', doc_id=doc.id) }}" class="btn-icon btn-view" target="_blank">👁️ Ver</a>
+                    <a href="{{ url_for('eliminar_documento_personal', doc_id=doc.id) }}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar este documento?')">🗑️</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    📭 No hay documentos subidos para este empleado.
+                    <a href="{{ url_for('subir_documento_personal', personal_id=persona.id) }}">Subir el primer documento</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .header-section h2 {
+        color: #2c3e50;
+        margin: 0;
+    }
+    .header-buttons {
+        display: flex;
+        gap: 12px;
+    }
+    .stats-summary {
+        margin-bottom: 24px;
+    }
+    .stat-card-mini {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        font-size: 24px;
+    }
+    .stat-number {
+        font-size: 28px;
+        font-weight: bold;
+        color: #667eea;
+    }
+    .badge-expired {
+        display: inline-block;
+        padding: 2px 8px;
+        background: #fee2e2;
+        color: #dc2626;
+        border-radius: 12px;
+        font-size: 11px;
+        margin-left: 8px;
+    }
+    .badge-valid {
+        display: inline-block;
+        padding: 2px 8px;
+        background: #d1fae5;
+        color: #065f46;
+        border-radius: 12px;
+        font-size: 11px;
+        margin-left: 8px;
+    }
+    .text-danger {
+        color: #dc2626;
+        font-weight: 600;
+    }
+    .expired {
+        background: #fef2f2;
+    }
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 10px;
+    }
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 10px;
+    }
+    .btn-icon {
+        display: inline-block;
+        padding: 6px 12px;
+        margin: 0 4px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+    }
+    .btn-view { background: #e0f2fe; color: #0284c7; }
+    .btn-delete { background: #fee2e2; color: #dc2626; }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #d1fae5;
+        color: #065f46;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .table-wrapper {
+        background: white;
+        border-radius: 16px;
+        overflow-x: auto;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+    .data-table th {
+        background: #f8fafc;
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+    }
+    .data-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+</style>
+{% endblock %}

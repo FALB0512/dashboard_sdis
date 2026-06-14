@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="color: #2c3e50; font-size: 24px; font-weight: 700; margin: 0;">
+            📤 Subir Documento
+        </h2>
+        <a href="{{ url_for('listar_documentos', nino_id=nino.id) }}" class="btn-secondary">← Volver</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" style="background: white; border-radius: 16px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        
+        <div class="form-group">
+            <label>👶 Niño</label>
+            <div class="info-box">{{ nino.nombre_completo }}</div>
+        </div>
+
+        <div class="form-group">
+            <label>📄 Tipo de Documento *</label>
+            <select name="tipo_documento" required>
+                <option value="">Seleccionar tipo</option>
+                {% for tipo in tipos_documento %}
+                <option value="{{ tipo }}">{{ tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>📎 Archivo *</label>
+            <input type="file" name="archivo" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+            <small>Formatos permitidos: PDF, JPG, PNG, DOC (Max 16MB)</small>
+        </div>
+
+        <div class="form-group">
+            <label>📅 Fecha de Vencimiento (opcional)</label>
+            <input type="date" name="fecha_vencimiento">
+            <small>Ej: Fecha de vencimiento de carnet EPS, autorizaciones, etc.</small>
+        </div>
+
+        <div class="form-group">
+            <label>📝 Observaciones</label>
+            <textarea name="observaciones" rows="3" placeholder="Información adicional sobre el documento..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px;">
+            <button type="submit" class="btn-primary" style="flex: 1;">
+                📤 Subir Documento
+            </button>
+            <a href="{{ url_for('listar_documentos', nino_id=nino.id) }}" class="btn-secondary" style="text-align: center; line-height: 42px;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 24px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .info-box {
+        background: #f1f5f9;
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: #1e293b;
+        font-weight: 500;
+    }
+    small {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 12px;
+    }
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+    }
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-secondary:hover {
+        background: #475569;
+    }
+</style>
+{% endblock %}

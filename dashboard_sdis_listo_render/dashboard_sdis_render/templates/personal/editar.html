@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2>✏️ Editar Empleado</h2>
+        <a href="{{ url_for('ver_personal', id=persona.id) }}" class="btn-secondary">← Volver al Perfil</a>
+    </div>
+
+    <form method="POST" class="form-grid">
+        <!-- Información Personal -->
+        <div class="form-section">
+            <h3>📋 Información Personal</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre completo *</label>
+                    <input type="text" name="nombre_completo" value="{{ persona.nombre_completo }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Documento de identidad *</label>
+                    <input type="text" name="documento_identidad" value="{{ persona.documento_identidad }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de documento</label>
+                    <select name="tipo_documento">
+                        <option value="CC" {% if persona.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="TI" {% if persona.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                        <option value="CE" {% if persona.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                        <option value="PA" {% if persona.tipo_documento == 'PA' %}selected{% endif %}>Pasaporte</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de nacimiento</label>
+                    <input type="date" name="fecha_nacimiento" value="{{ persona.fecha_nacimiento or '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Género</label>
+                    <select name="genero">
+                        <option value="">Seleccionar</option>
+                        <option value="Femenino" {% if persona.genero == 'Femenino' %}selected{% endif %}>Femenino</option>
+                        <option value="Masculino" {% if persona.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" name="telefono" value="{{ persona.telefono or '' }}" placeholder="Ej: 3001234567">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ persona.email or '' }}" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Dirección</label>
+                    <input type="text" name="direccion" value="{{ persona.direccion or '' }}" placeholder="Calle 123 #45-67">
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Laboral -->
+        <div class="form-section">
+            <h3>💼 Información Laboral</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cargo *</label>
+                    <select name="cargo" required>
+                        <option value="">Seleccionar cargo</option>
+                        {% for cargo in cargos %}
+                        <option value="{{ cargo }}" {% if persona.cargo == cargo %}selected{% endif %}>{{ cargo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Especialidad / Área</label>
+                    <input type="text" name="especialidad" value="{{ persona.especialidad or '' }}" placeholder="Ej: Educación Inicial, Psicología Clínica">
+                </div>
+                <div class="form-group">
+                    <label>Jardín asignado *</label>
+                    <select name="jardin_id" required>
+                        <option value="">Seleccionar jardín</option>
+                        {% for j in jardines %}
+                        <option value="{{ j.id }}" {% if persona.jardin_id == j.id %}selected{% endif %}>{{ j.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de contratación *</label>
+                    <input type="date" name="fecha_contratacion" value="{{ persona.fecha_contratacion }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Salario</label>
+                    <input type="text" name="salario" value="{{ '{:,.0f}'.format(persona.salario|float) if persona.salario else '' }}" placeholder="Ej: 2,500,000">
+                </div>
+                <div class="form-group">
+                    <label>Horario</label>
+                    <input type="text" name="horario" value="{{ persona.horario or '' }}" placeholder="Ej: Lunes a Viernes 7am-2pm">
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select name="estado">
+                        <option value="Activo" {% if persona.estado == 'Activo' %}selected{% endif %}>Activo</option>
+                        <option value="Inactivo" {% if persona.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+                        <option value="Vacaciones" {% if persona.estado == 'Vacaciones' %}selected{% endif %}>Vacaciones</option>
+                        <option value="Licencia" {% if persona.estado == 'Licencia' %}selected{% endif %}>Licencia</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de Seguridad Social -->
+        <div class="form-section">
+            <h3>🏥 Seguridad Social</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>EPS</label>
+                    <input type="text" name="eps" value="{{ persona.eps or '' }}" placeholder="Ej: Nueva EPS, Sanitas">
+                </div>
+                <div class="form-group">
+                    <label>ARL</label>
+                    <input type="text" name="arl" value="{{ persona.arl or '' }}" placeholder="Ej: Sura, Positiva">
+                </div>
+                <div class="form-group">
+                    <label>Fondo de Pensiones</label>
+                    <input type="text" name="fondo_pension" value="{{ persona.fondo_pension or '' }}" placeholder="Ej: Porvenir, Protección">
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-section">
+            <h3>📝 Observaciones</h3>
+            <div class="form-group">
+                <textarea name="observaciones" rows="4" placeholder="Información adicional...">{{ persona.observaciones or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">💾 Guardar Cambios</button>
+            <a href="{{ url_for('ver_personal', id=persona.id) }}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .form-header h2 {
+        color: #2c3e50;
+        margin: 0;
+        font-size: 24px;
+    }
+    .form-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .form-section h3 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .form-group {
+        margin-bottom: 0;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 13px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    .form-group input:disabled {
+        background: #f1f5f9;
+        cursor: not-allowed;
+    }
+    textarea {
+        resize: vertical;
+    }
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: flex-end;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e2e8f0;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 28px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+    }
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #475569;
+        padding: 12px 28px;
+        border-radius: 10px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-secondary:hover {
+        background: #cbd5e1;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .form-container {
+            padding: 20px;
+        }
+        .form-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+</style>
+{% endblock %}

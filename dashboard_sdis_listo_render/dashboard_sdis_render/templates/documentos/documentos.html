@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="table-header" style="margin-bottom: 24px;">
+        <h2 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            ✏️ Actualizar Documento
+        </h2>
+        <a href="{{ url_for('listar_documentos', nino_id=documento.nino_id) }}" class="btn-primary" style="background: #6c757d;">← Volver</a>
+    </div>
+
+    <form method="POST" style="background: rgba(255,255,255,0.95); border-radius: 24px; padding: 32px;">
+        
+        <div class="form-group">
+            <label>📄 Tipo de Documento</label>
+            <input type="text" value="{{ documento.tipo_documento }}" disabled style="background: #f1f5f9;">
+        </div>
+
+        <div class="form-group">
+            <label>📅 Fecha de Vencimiento</label>
+            <input type="date" name="fecha_vencimiento" value="{{ documento.fecha_vencimiento or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>📝 Observaciones</label>
+            <textarea name="observaciones" rows="3">{{ documento.observaciones or '' }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 24px;">
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex: 1;">
+                💾 Guardar Cambios
+            </button>
+            <a href="{{ url_for('listar_documentos', nino_id=documento.nino_id) }}" class="btn-primary" style="background: #6c757d; text-align: center; line-height: 42px;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 24px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14px;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <!-- Encabezado -->
+    <div class="page-header">
+        <h1 class="page-title">👧 Detalle de Matrícula</h1>
+        <div class="header-actions">
+            <a href="{{ url_for('listar_documentos', nino_id=matricula.id) }}" class="btn-docs">
+                📄 Documentos ({{ documentos_count }})
+            </a>
+            <a href="{{ url_for('listar_matriculas') }}" class="btn-back">← Volver</a>
+        </div>
+    </div>
+
+    <!-- Tarjetas de información -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+        
+        <!-- Información del Niño -->
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 24px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: white; margin: 0;">👶 Información del Niño</h3>
+            </div>
+            
+            <div style="display: grid; gap: 12px;">
+                <div><strong>Nombre completo:</strong> {{ matricula.nombre_completo }}</div>
+                <div><strong>Documento de identidad:</strong> {{ matricula.documento_identidad }}</div>
+                <div><strong>Fecha de nacimiento:</strong> {{ matricula.fecha_nacimiento }}</div>
+                <div><strong>Género:</strong> {{ matricula.genero or 'No especificado' }}</div>
+                <div><strong>Dirección:</strong> {{ matricula.direccion or 'No registrada' }}</div>
+                <div><strong>EPS:</strong> {{ matricula.eps or 'No registrada' }}</div>
+                <div><strong>Tipo de sangre:</strong> {{ matricula.tipo_sangre or 'No registrado' }}</div>
+                <div><strong>Alergias:</strong> 
+                    {% if matricula.tiene_alergias == 'Si' %}
+                        <span style="color: #e74c3c;">Sí - {{ matricula.alergias_descripcion }}</span>
+                    {% else %}
+                        <span style="color: #27ae60;">No</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Académica -->
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 24px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: white; margin: 0;">🏫 Información Académica</h3>
+            </div>
+            
+            <div style="display: grid; gap: 12px;">
+                <div><strong>Jardín asignado:</strong> {{ matricula.jardin_nombre }}</div>
+                <div><strong>Dirección del jardín:</strong> {{ matricula.jardin_direccion }}</div>
+                <div><strong>Fecha de matrícula:</strong> {{ matricula.fecha_matricula }}</div>
+                <div><strong>Estado de matrícula:</strong> 
+                    <span class="status-active">{{ matricula.estado_matricula }}</span>
+                </div>
+                <div><strong>Estrato socioeconómico:</strong> {{ matricula.estrato or 'No registrado' }}</div>
+                <div><strong>Apoyo académico:</strong> 
+                    {% if matricula.apoyo_academico == 'Si' %}
+                        <span style="color: #f39c12;">Requiere apoyo</span>
+                    {% else %}
+                        <span style="color: #27ae60;">No requiere</span>
+                    {% endif %}
+                </div>
+                <div><strong>Autorización fotográfica:</strong> 
+                    {% if matricula.autorizacion_foto == 'Si' %}
+                        <span style="color: #27ae60;">✓ Autorizada</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">✗ No autorizada</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Acudiente -->
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 24px; grid-column: span 2;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: white; margin: 0;">👨‍👩 Acudiente Responsable</h3>
+            </div>
+            
+            {% if acudiente %}
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div><strong>Nombre completo:</strong> {{ acudiente.nombre_completo }}</div>
+                <div><strong>Documento:</strong> {{ acudiente.documento_identidad }}</div>
+                <div><strong>Teléfono:</strong> {{ acudiente.telefono or 'No registrado' }}</div>
+                <div><strong>Email:</strong> {{ acudiente.email or 'No registrado' }}</div>
+                <div><strong>Dirección:</strong> {{ acudiente.direccion or 'No registrada' }}</div>
+                <div><strong>Parentesco:</strong> {{ acudiente.parentesco or 'No especificado' }}</div>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: #7f8c8d;">No hay información de acudiente registrada</p>
+            {% endif %}
+        </div>
+
+        <!-- Observaciones -->
+        {% if matricula.observaciones %}
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 24px; grid-column: span 2;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="color: white; margin: 0;">📝 Observaciones</h3>
+            </div>
+            <p>{{ matricula.observaciones }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Botones de acción -->
+    <div style="display: flex; gap: 16px; margin-top: 32px; justify-content: flex-end;">
+        <a href="{{ url_for('eliminar_matricula', id=matricula.id) }}" class="btn-primary" style="background: #dc3545;" onclick="return confirm('¿Eliminar esta matrícula? Esta acción también eliminará todos los documentos asociados.')">
+            🗑️ Eliminar Matrícula
+        </a>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+    .btn-docs {
+        background: #8b5cf6;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    .btn-docs:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+    }
+    .btn-back {
+        background: #64748b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    .btn-back:hover {
+        background: #475569;
+    }
+</style>
+{% endblock %}

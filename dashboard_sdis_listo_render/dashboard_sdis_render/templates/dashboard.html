@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Primera fila: Estadísticas principales -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">TOTAL JARDINES</div>
+        <div class="stat-number">{{ total_jardines }}</div>
+        <div class="stat-compare">Administrados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">NIÑOS MATRICULADOS</div>
+        <div class="stat-number">{{ total_matriculados }}</div>
+        <div class="stat-compare">📈 +3,2% vs. mes anterior</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">CUPOS DISPONIBLES</div>
+        <div class="stat-number">{{ cupos_disponibles }}</div>
+        <div class="stat-compare">{{ (ocupacion_total + 10)|round(1) }}% de capacidad</div>
+    </div>
+</div>
+
+<!-- Segunda fila: Ocupación + Indicadores rápidos -->
+<div class="metrics-row">
+    <div class="occupancy-card">
+        <div class="occupancy-title">Ocupación de cupos</div>
+        <div class="occupancy-stats">
+            <div class="occupancy-item">
+                <div class="occupancy-value">{{ ocupacion_total }}%</div>
+                <div class="occupancy-label">Ocupación</div>
+            </div>
+            <div class="occupancy-item">
+                <div class="occupancy-value">85%</div>
+                <div class="occupancy-label">Meta ocupados</div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-fill" :style="{ width: ocupacion_total + '%' }"></div>
+        </div>
+        <div class="occupancy-label" style="margin-top: 12px;">Capacidad total: {{ capacidad_total }} niños</div>
+    </div>
+    
+    <div class="info-card">
+        <div class="info-row">
+            <span class="info-label">Personal activo</span>
+            <span class="info-value">{{ personal_activo }} <span class="info-trend">+2 nuevos esta semana</span></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Asistencia del día</span>
+            <span class="info-value">{{ asistencia_dia }}% <span class="info-trend">{{ (total_matriculados * asistencia_dia / 100)|int }} / {{ total_matriculados }} niños</span></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Alertas pendientes</span>
+            <span class="info-value">{{ alertas_pendientes }} 28 <span class="info-trend">Requieren atención</span></span>
+        </div>
+    </div>
+</div>
+
+<!-- Gestión en tiempo real -->
+<div class="realtime-card">
+    <div class="realtime-title">Gestión en tiempo real</div>
+    <div class="features-grid">
+        <div class="feature-item"><span class="feature-icon">🏫</span> Gestion centralizada de sedes — {{ total_jardines }} jardines conectadas</div>
+        <div class="feature-item"><span class="feature-icon">✅</span> Control de asistencia en tiempo real</div>
+        <div class="feature-item"><span class="feature-icon">🔄</span> Actualización automática</div>
+        <div class="feature-item"><span class="feature-icon">💉</span> Historial de salud y vacunación — Registro completo y al día</div>
+        <div class="feature-item"><span class="feature-icon">📊</span> Reportes automáticos — Informes listados para decisiones</div>
+        <div class="feature-item"><span class="feature-icon">💬</span> Comunicación con familias — Mensajes y notificaciones</div>
+        <div class="feature-item"><span class="feature-icon">⚠️</span> Alertas operativas — Detectamos y prevenimos a tiempo</div>
+    </div>
+</div>
+
+<!-- Listado de jardines -->
+<div class="section-title">Jardines administrados</div>
+<div class="jardines-header">
+    <div class="jardines-badge">Mostrando 1 a {{ total_jardines }} de {{ total_jardines }} jardines</div>
+    <a href="{{ url_for('crear_jardin') }}" class="btn-primary">+ Nuevo Jardín</a>
+</div>
+
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th><th>Jardín Infantil</th><th>Dirección</th><th>Localidad</th>
+                <th>Estado</th><th>Capacidad</th><th>Matriculados</th><th>Ocupación</th><th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for j in jardines %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><strong>{{ j.nombre }}</strong></td>
+                <td>{{ j.direccion[:45] }}{% if j.direccion|length > 45 %}...{% endif %}</td>
+                <td>{{ j.localidad }}</td>
+                <td><span class="status-active">{{ j.estado }}</span></td>
+                <td>{{ j.capacidad }}</td>
+                <td>{{ j.matriculados }}</td>
+                <td class="{% if j.ocupacion >= 85 %}occupancy-high{% else %}occupancy-full{% endif %}">{{ j.ocupacion }}%</td>
+                <td>
+                    <a href="{{ url_for('editar_jardin', id=j.id) }}" class="btn-icon btn-edit">✏️</a>
+                    <a href="{{ url_for('eliminar_jardin', id=j.id) }}" class="btn-icon btn-delete" onclick="return confirm('¿Eliminar?')">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Grid inferior: Actividades y Alertas -->
+<div class="bottom-grid">
+    <!-- Actividades recientes -->
+    <div class="activity-card">
+        <div class="card-header">
+            <h4>📋 Actividades recientes</h4>
+            <a href="#" class="card-link">Ver todas →</a>
+        </div>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h5>Reunión de equipo pedagógico</h5>
+                    <p>Sede Paraíso</p>
+                </div>
+                <div class="activity-time">Hoy</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h5>Visita de nutricionista</h5>
+                    <p>Jardín La Estrella</p>
+                </div>
+                <div class="activity-time">Mañana</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h5>Taller de familia: Crianza positiva</h5>
+                    <p>Sede Minuto de María</p>
+                </div>
+                <div class="activity-time">Miércoles</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h5>Comité de convivencia</h5>
+                    <p>Sede Arborizadora Alta</p>
+                </div>
+                <div class="activity-time">Jueves</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas recientes -->
+    <div class="alerts-card">
+        <div class="card-header">
+            <h4>⚠️ Alertas pendientes ({{ alertas_pendientes }})</h4>
+            <a href="#" class="card-link">Ver todas →</a>
+        </div>
+        <div class="alerts-list">
+            <div class="alert-item alert-warning">
+                <div class="activity-info">
+                    <h5>Nueva matrícula registrada</h5>
+                    <p>Jardín Paraíso</p>
+                </div>
+                <div class="alert-time">Hace 15 min</div>
+            </div>
+            <div class="alert-item">
+                <div class="activity-info">
+                    <h5>Asistencia del día actualizada</h5>
+                    <p>Jardín La Estrella</p>
+                </div>
+                <div class="alert-time">Hace 45 min</div>
+            </div>
+            <div class="alert-item">
+                <div class="activity-info">
+                    <h5>Documentos vencidos</h5>
+                    <p>Jardín Luna Lunea</p>
+                </div>
+                <div class="alert-time">Hace 1h</div>
+            </div>
+            <div class="alert-item">
+                <div class="activity-info">
+                    <h5>Vacuna registrada</h5>
+                    <p>Jardín Dejando Huella</p>
+                </div>
+                <div class="alert-time">Hace 2h</div>
+            </div>
+            <div class="alert-item">
+                <div class="activity-info">
+                    <h5>Mensaje enviado a familias</h5>
+                    <p>Jardín Minuto de María</p>
+                </div>
+                <div class="alert-time">Hace 3h</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de alertas adicionales -->
+<div class="alerts-table">
+    <div class="card-header">
+        <h4>📋 Resumen de gestión</h4>
+        <a href="#" class="card-link">Ver todas →</a>
+    </div>
+    <div class="alerts-grid">
+        <div class="alert-category"><span>📄 Documentos por vencerse</span><span>Contratos y certificados</span></div>
+        <div class="alert-category"><span>💉 Vacunas pendientes</span><span>Esperanza incompétente</span></div>
+        <div class="alert-category"><span>🩺 Vacunas convencionales</span><span>Niños ausentes 3+ días</span></div>
+        <div class="alert-category"><span>⚠️ Incidencias reportadas</span><span>Requieren seguimiento</span></div>
+    </div>
+</div>
+{% endblock %}
