@@ -235,54 +235,231 @@ def auditoria():
     db=get_db(); rows=db.execute('SELECT * FROM auditoria'+where+' ORDER BY id DESC LIMIT 1000',params).fetchall(); db.close()
     return render_template('auditoria/listar.html', registros=rows)
 
-# ==================== COMUNICACIONES / GESTIÓN DOCUMENTAL ====================
-COM_TIPOS = ['Interna','Recibida','Enviada','Respuesta']
-COM_PRIORIDADES = ['Baja','Media','Alta','Urgente']
-COM_ESTADOS = ['Borrador','Radicado','Asignado','En trámite','Devuelto','Reasignado','Respondido','Archivado','Anulado']
+# ==================== COMUNICACIONES / CENTRO DE CONSULTA ====================
+# Módulo solicitado: vista principal con botones, glosario A-Z con ventana flotante,
+# pósters visuales y formatos institucionales para visualizar y descargar.
+COMUNICACION_POSTERS = [{'slug': 'iconografia-conservacion-documental',
+  'titulo': 'Iconografía de conservación documental',
+  'subtitulo': 'Símbolos clave para el cuidado y manejo de documentos en el archivo.',
+  'imagen': 'img/comunicaciones/iconografia_conservacion.jpg',
+  'categoria': 'Iconografía',
+  'descripcion': 'Póster de conservación documental con símbolos para proteger documentos de humedad, luz solar, '
+                 'alimentos, dobleces, plagas y acceso no autorizado.',
+  'aplicacion': 'Depósitos, cajas, estanterías, zonas de consulta y áreas de manejo documental.'},
+ {'slug': 'senalizacion-sst-archivo',
+  'titulo': 'Señalización de SST en el archivo',
+  'subtitulo': 'Señales clave para la seguridad y prevención en áreas de archivo.',
+  'imagen': 'img/comunicaciones/senalizacion_sst.jpg',
+  'categoria': 'Señalización',
+  'descripcion': 'Póster con señales de evacuación, salida de emergencia, extintor, riesgos eléctricos, uso de '
+                 'tapabocas, guantes, capacidad de carga, área restringida y punto de encuentro.',
+  'aplicacion': 'Pasillos, depósitos, zonas de transferencia, estanterías y áreas de limpieza documental.'},
+ {'slug': 'simbologia-digital-gestion-documental',
+  'titulo': 'Simbología digital en la gestión documental',
+  'subtitulo': 'Iconos clave para la consulta, control y manejo de documentos digitales.',
+  'imagen': 'img/comunicaciones/simbologia_digital.jpg',
+  'categoria': 'Simbología',
+  'descripcion': 'Póster con iconos digitales como lupa, guardar, editar, eliminar, adjuntar, descargar, cargar, '
+                 'carpeta, candado, alerta, firma, nube, historial, compartir, filtro y código QR.',
+  'aplicacion': 'NubiDoc, repositorios electrónicos, carpetas compartidas, correos institucionales y sistemas de '
+                'gestión documental.'},
+ {'slug': 'transferencias-correctas',
+  'titulo': 'Transferencias correctas',
+  'subtitulo': 'Una transferencia correcta evita devoluciones y reprocesos.',
+  'imagen': 'img/comunicaciones/transferencias_correctas.jpg',
+  'categoria': 'Socialización',
+  'descripcion': 'Póster para recordar la verificación de serie, subserie, expedientes completos, foliación continua, '
+                 'inventario actualizado y cajas o carpetas identificadas.',
+  'aplicacion': 'Transferencias documentales, revisión de expedientes, entrega de cajas y control de inventarios.'},
+ {'slug': 'gestion-documental-cada-dependencia',
+  'titulo': 'La gestión documental comienza en cada dependencia',
+  'subtitulo': 'Cada área produce, organiza y protege la información institucional.',
+  'imagen': 'img/comunicaciones/gestion_documental_dependencia.jpg',
+  'categoria': 'Socialización',
+  'descripcion': 'Póster de buenas prácticas desde el origen: clasificar por TRD, organizar expedientes, identificar '
+                 'carpetas, conservar información física y digital y usar NubiDoc.',
+  'aplicacion': 'Dependencias productoras, enlaces documentales, responsables de archivo y usuarios internos.'}]
 
-def generar_radicado_comunicacion(db, tipo):
-    prefijo = {'Interna':'INT','Recibida':'REC','Enviada':'ENV','Respuesta':'ENV'}.get(tipo,'COM')
-    anio = datetime.now().year
-    fila = db.execute("SELECT COUNT(*) total FROM comunicaciones WHERE tipo=? AND strftime('%Y', fecha_creacion)=?", (tipo,str(anio))).fetchone()
-    return f"{prefijo}-{anio}-{fila['total'] + 1:06d}"
+COMUNICACION_RECURSOS = [{'slug': 'acta-rechazo-tecnico-documental',
+  'titulo': 'Acta de Rechazo Técnico Documental',
+  'subtitulo': 'Formato para formalizar devoluciones técnicas de transferencias documentales.',
+  'tipo': 'Protocolo',
+  'responsable': 'Área de archivo',
+  'actualizacion': '18/06/2026',
+  'descripcion': 'Permite registrar datos de transferencia, resultado de revisión, inconsistencias, fundamento '
+                 'técnico, acciones correctivas, segunda revisión y validación.',
+  'docx': 'docs/comunicaciones/acta_rechazo_tecnico_documental_nubidoc.docx',
+  'pdf': 'docs/comunicaciones/pdf/acta_rechazo_tecnico_documental_nubidoc.pdf'},
+ {'slug': 'formato-mejora-comunicativa-phva',
+  'titulo': 'Formato de Registro y Mejora Comunicativa PHVA',
+  'subtitulo': 'Formato para registrar fallas comunicativas y aplicar acciones de mejora.',
+  'tipo': 'Acciones de mejora',
+  'responsable': 'Gestión Documental',
+  'actualizacion': '18/06/2026',
+  'descripcion': 'Incluye datos generales, identificación de la falla comunicativa, consecuencia, acción correctiva, '
+                 'ciclo PHVA, lista de chequeo, seguimiento y cierre.',
+  'docx': 'docs/comunicaciones/formato_registro_mejora_comunicativa_phva.docx',
+  'pdf': 'docs/comunicaciones/pdf/formato_registro_mejora_comunicativa_phva.pdf'}]
 
-def puede_ver_comunicacion(db, doc):
-    u=current_user()
-    if not u: return False
-    if u['rol'] in ('superadmin','admin','auditor'): return True
-    if doc['creado_por']==u['id'] or doc['responsable_id']==u['id']: return True
-    return bool(db.execute('SELECT 1 FROM comunicacion_destinatarios WHERE comunicacion_id=? AND usuario_id=?',(doc['id'],u['id'])).fetchone())
+GLOSARIO_ARCHIVISTICO = [{'termino': 'Archivo',
+  'definicion': 'Conjunto organizado de documentos producidos o recibidos por una entidad en el desarrollo de sus '
+                'funciones.',
+  'letra': 'A'},
+ {'termino': 'Archivo central',
+  'definicion': 'Unidad que recibe, organiza, conserva y administra los documentos transferidos por los archivos de '
+                'gestión.',
+  'letra': 'A'},
+ {'termino': 'Archivo de gestión',
+  'definicion': 'Archivo ubicado en cada dependencia, conformado por documentos de uso frecuente y trámite activo.',
+  'letra': 'A'},
+ {'termino': 'Archivo histórico',
+  'definicion': 'Archivo que conserva documentos con valor permanente por su importancia administrativa, legal, '
+                'cultural o histórica.',
+  'letra': 'A'},
+ {'termino': 'Clasificación documental',
+  'definicion': 'Proceso mediante el cual se identifican y agrupan los documentos según las funciones, series y '
+                'subseries documentales.',
+  'letra': 'C'},
+ {'termino': 'Conservación documental',
+  'definicion': 'Conjunto de acciones preventivas o correctivas orientadas a proteger los documentos físicos.',
+  'letra': 'C'},
+ {'termino': 'Correspondencia',
+  'definicion': 'Conjunto de comunicaciones oficiales enviadas o recibidas por una entidad.',
+  'letra': 'C'},
+ {'termino': 'Descripción documental',
+  'definicion': 'Proceso que permite identificar y registrar información sobre los documentos para facilitar su '
+                'consulta y control.',
+  'letra': 'D'},
+ {'termino': 'Documento de archivo',
+  'definicion': 'Registro de información producido o recibido por una entidad como evidencia de sus funciones, '
+                'actividades o decisiones.',
+  'letra': 'D'},
+ {'termino': 'Documento electrónico',
+  'definicion': 'Información producida, recibida o conservada en medios digitales, con valor administrativo, legal o '
+                'institucional.',
+  'letra': 'D'},
+ {'termino': 'Eliminación documental',
+  'definicion': 'Destrucción autorizada de documentos que han cumplido su tiempo de retención y no poseen valor '
+                'permanente.',
+  'letra': 'E'},
+ {'termino': 'Expediente',
+  'definicion': 'Conjunto de documentos relacionados con un mismo trámite, asunto, persona o proceso.',
+  'letra': 'E'},
+ {'termino': 'Foliación',
+  'definicion': 'Numeración consecutiva de cada hoja que compone un expediente o unidad documental.',
+  'letra': 'F'},
+ {'termino': 'Fondo documental',
+  'definicion': 'Totalidad de documentos producidos o recibidos por una entidad en el desarrollo de sus funciones.',
+  'letra': 'F'},
+ {'termino': 'Inventario documental',
+  'definicion': 'Instrumento que describe y relaciona los documentos, expedientes o cajas que conserva o transfiere '
+                'una dependencia.',
+  'letra': 'I'},
+ {'termino': 'Ordenación documental',
+  'definicion': 'Ubicación de los documentos dentro de una unidad documental según un criterio establecido.',
+  'letra': 'O'},
+ {'termino': 'Preservación digital',
+  'definicion': 'Acciones destinadas a garantizar la conservación, autenticidad y acceso a los documentos electrónicos '
+                'a largo plazo.',
+  'letra': 'P'},
+ {'termino': 'Préstamo documental',
+  'definicion': 'Entrega temporal y controlada de documentos o expedientes para consulta por parte de un usuario '
+                'autorizado.',
+  'letra': 'P'},
+ {'termino': 'Radicación',
+  'definicion': 'Registro oficial de entrada o salida de una comunicación, asignándole un número único de control.',
+  'letra': 'R'},
+ {'termino': 'Sección',
+  'definicion': 'División del fondo documental que corresponde a una dependencia o unidad administrativa.',
+  'letra': 'S'},
+ {'termino': 'Serie documental',
+  'definicion': 'Conjunto de unidades documentales producidas por una dependencia en cumplimiento de una misma '
+                'función.',
+  'letra': 'S'},
+ {'termino': 'Subsección',
+  'definicion': 'División interna de una sección, correspondiente a una unidad administrativa más específica.',
+  'letra': 'S'},
+ {'termino': 'Subserie documental',
+  'definicion': 'División de una serie documental que agrupa documentos con características más específicas.',
+  'letra': 'S'},
+ {'termino': 'Tabla de Retención Documental, TRD',
+  'definicion': 'Instrumento archivístico que establece las series, subseries y tiempos de conservación de los '
+                'documentos en cada fase del archivo.',
+  'letra': 'T'},
+ {'termino': 'Tabla de Valoración Documental, TVD',
+  'definicion': 'Instrumento que determina los valores y tiempos de conservación de documentos acumulados que no '
+                'cuentan con TRD.',
+  'letra': 'T'},
+ {'termino': 'Testigo documental',
+  'definicion': 'Registro o señal que reemplaza temporalmente un documento retirado de su ubicación original.',
+  'letra': 'T'},
+ {'termino': 'Tipo documental',
+  'definicion': 'Clase específica de documento que se produce dentro de un trámite o procedimiento.',
+  'letra': 'T'},
+ {'termino': 'Transferencia primaria',
+  'definicion': 'Traslado de documentos del archivo de gestión al archivo central, una vez cumplido su tiempo de '
+                'permanencia en la dependencia.',
+  'letra': 'T'},
+ {'termino': 'Transferencia secundaria',
+  'definicion': 'Traslado de documentos del archivo central al archivo histórico cuando poseen valor permanente.',
+  'letra': 'T'},
+ {'termino': 'Unidad documental',
+  'definicion': 'Documento o conjunto de documentos que conforman una unidad dentro de una serie documental.',
+  'letra': 'U'}]
 
-def registrar_movimiento(db, comunicacion_id, accion, detalle='', estado_anterior=None, estado_nuevo=None):
-    u=current_user(); ahora=datetime.now().isoformat(timespec='seconds')
-    db.execute("""INSERT INTO comunicacion_movimientos
-        (comunicacion_id,usuario_id,fecha_hora,accion,detalle,estado_anterior,estado_nuevo)
-        VALUES (?,?,?,?,?,?,?)""",(comunicacion_id,u['id'] if u else None,ahora,accion,detalle,estado_anterior,estado_nuevo))
+
+def obtener_recurso_comunicacion(slug):
+    for recurso in COMUNICACION_RECURSOS:
+        if recurso['slug'] == slug:
+            return recurso
+    return None
+
+
+def obtener_poster_comunicacion(slug):
+    for poster in COMUNICACION_POSTERS:
+        if poster['slug'] == slug:
+            return poster
+    return None
+
+
+def posters_socializacion():
+    return [p for p in COMUNICACION_POSTERS if p.get('categoria') == 'Socialización']
+
 
 @app.route('/comunicaciones')
 def comunicaciones():
-    db=get_db(); u=current_user(); filtro=request.args.get('bandeja','entrada'); q=request.args.get('q','').strip(); estado=request.args.get('estado','')
-    base="""SELECT c.*, uc.nombre_completo creador_nombre, ur.nombre_completo responsable_nombre,
-      (SELECT group_concat(u2.nombre_completo, ', ') FROM comunicacion_destinatarios cd JOIN usuarios u2 ON u2.id=cd.usuario_id WHERE cd.comunicacion_id=c.id) destinatarios
-      FROM comunicaciones c LEFT JOIN usuarios uc ON uc.id=c.creado_por LEFT JOIN usuarios ur ON ur.id=c.responsable_id"""
-    filtros=[]; params=[]
-    if u['rol'] not in ('superadmin','admin','auditor'):
-        if filtro=='enviados': filtros.append('c.creado_por=?'); params.append(u['id'])
-        elif filtro=='archivados': filtros.append("c.estado='Archivado' AND (c.creado_por=? OR c.responsable_id=? OR EXISTS(SELECT 1 FROM comunicacion_destinatarios x WHERE x.comunicacion_id=c.id AND x.usuario_id=?))"); params += [u['id']]*3
-        elif filtro=='devueltos': filtros.append("c.estado='Devuelto' AND (c.creado_por=? OR c.responsable_id=? OR EXISTS(SELECT 1 FROM comunicacion_destinatarios x WHERE x.comunicacion_id=c.id AND x.usuario_id=?))"); params += [u['id']]*3
-        elif filtro=='borradores': filtros.append("c.estado='Borrador' AND c.creado_por=?"); params.append(u['id'])
-        else: filtros.append('(c.responsable_id=? OR EXISTS(SELECT 1 FROM comunicacion_destinatarios x WHERE x.comunicacion_id=c.id AND x.usuario_id=?))'); params += [u['id'],u['id']]
-    else:
-        if filtro=='archivados': filtros.append("c.estado='Archivado'")
-        elif filtro=='devueltos': filtros.append("c.estado='Devuelto'")
-        elif filtro=='borradores': filtros.append("c.estado='Borrador'")
-        elif filtro=='enviados': filtros.append('c.creado_por=?'); params.append(u['id'])
-    if q: filtros.append('(c.radicado LIKE ? OR c.asunto LIKE ? OR c.remitente_externo LIKE ?)'); params += [f'%{q}%']*3
-    if estado: filtros.append('c.estado=?'); params.append(estado)
-    where=' WHERE '+' AND '.join(filtros) if filtros else ''
-    docs=db.execute(base+where+' ORDER BY c.id DESC',params).fetchall()
-    resumen=db.execute('SELECT estado,COUNT(*) total FROM comunicaciones GROUP BY estado').fetchall(); db.close()
-    return render_template('comunicaciones/listar.html',documentos=docs,resumen=resumen,estados=COM_ESTADOS,bandeja=filtro)
+    log_audit(get_db, 'Consulta comunicaciones', 'Ingreso al módulo de comunicaciones', 'Exitoso', modulo='Comunicaciones')
+    return render_template('comunicaciones/index.html')
+
+
+@app.route('/comunicaciones/glosario')
+def glosario_comunicaciones():
+    log_audit(get_db, 'Consulta glosario', 'Glosario archivístico A-Z', 'Exitoso', modulo='Comunicaciones')
+    return render_template('comunicaciones/glosario.html', terminos=GLOSARIO_ARCHIVISTICO)
+
+
+@app.route('/comunicaciones/socializacion')
+def socializacion_comunicaciones():
+    log_audit(get_db, 'Consulta socialización', 'Pósters de socialización documental', 'Exitoso', modulo='Comunicaciones')
+    return render_template('comunicaciones/socializacion.html', posters=posters_socializacion())
+
+
+@app.route('/comunicaciones/poster/<slug>')
+def ver_poster_comunicacion(slug):
+    poster = obtener_poster_comunicacion(slug)
+    if not poster:
+        abort(404)
+    log_audit(get_db, 'Consulta póster de comunicación', poster['titulo'], 'Exitoso', modulo='Comunicaciones')
+    return render_template('comunicaciones/poster.html', poster=poster, posters=COMUNICACION_POSTERS)
+
+
+@app.route('/comunicaciones/recurso/<slug>')
+def ver_recurso_comunicacion(slug):
+    recurso = obtener_recurso_comunicacion(slug)
+    if not recurso:
+        abort(404)
+    log_audit(get_db, 'Consulta formato de comunicación', recurso['titulo'], 'Exitoso', modulo='Comunicaciones')
+    return render_template('comunicaciones/recurso.html', recurso=recurso, recursos=COMUNICACION_RECURSOS)
 
 @app.route('/comunicaciones/crear', methods=['GET','POST'])
 def crear_comunicacion():

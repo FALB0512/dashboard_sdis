@@ -2,7 +2,7 @@ import os
 import sqlite3
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import session, request, redirect, url_for, flash, abort, g
+from flask import session, request, redirect, url_for, flash, abort, g, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 
 ROLE_LABELS = {
@@ -17,7 +17,7 @@ BASIC_ENDPOINTS = {
     'dashboard', 'listar_jardines', 'crear_jardin', 'editar_jardin', 'eliminar_jardin',
     'listar_matriculas', 'crear_matricula', 'ver_matricula', 'eliminar_matricula',
     'listar_documentos', 'subir_documento', 'ver_documento', 'eliminar_documento',
-    'comunicaciones', 'crear_comunicacion', 'ver_comunicacion', 'radicar_comunicacion', 'devolver_comunicacion', 'reasignar_comunicacion', 'archivar_comunicacion', 'responder_comunicacion', 'descargar_adjunto_comunicacion', 'pqrs', 'ver_pqrs', 'gestionar_pqrs', 'responder_pqrs', 'descargar_adjunto_pqrs'
+    'comunicaciones', 'ver_poster_comunicacion', 'crear_comunicacion', 'ver_comunicacion', 'radicar_comunicacion', 'devolver_comunicacion', 'reasignar_comunicacion', 'archivar_comunicacion', 'responder_comunicacion', 'descargar_adjunto_comunicacion', 'pqrs', 'ver_pqrs', 'gestionar_pqrs', 'responder_pqrs', 'descargar_adjunto_pqrs'
 }
 PUBLIC_ENDPOINTS = {'login', 'static', 'pqrs_publica', 'consultar_pqrs_publica'}
 AUDIT_SKIP = {'static'}
@@ -170,4 +170,4 @@ def install_security(app, get_db):
     @app.errorhandler(403)
     def forbidden(error):
         log_audit(get_db, 'Acceso denegado', 'Intento de acceso sin permisos', 'Fallido')
-        return app.jinja_env.get_or_select_template('auth/403.html').render(), 403
+        return render_template('auth/403.html'), 403
