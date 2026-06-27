@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.resource-layout{display:grid;grid-template-columns:minmax(360px,1fr) 360px;gap:24px;align-items:start}.viewer{background:#fff;border-radius:22px;padding:16px;box-shadow:0 12px 35px rgba(15,40,70,.12)}.viewer iframe{width:100%;height:78vh;border:1px solid #dbe4f0;border-radius:14px;background:#f8fafc}.side{background:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 35px rgba(15,40,70,.12);position:sticky;top:20px}.side h2{margin:0 0 10px;color:#08356e}.side p{color:#4d5d70;line-height:1.55}.tag{display:inline-block;background:#e8f5ec;color:#216b36;padding:7px 12px;border-radius:999px;font-weight:900;font-size:12px;margin-bottom:12px}.actions{display:flex;flex-direction:column;gap:10px;margin:18px 0}.actions a{text-align:center;text-decoration:none;border-radius:12px;padding:12px 14px;font-weight:900}.primary{background:#0b4f9f;color:white}.secondary{background:#eef4fb;color:#0b3a75}.related{border-top:1px solid #e5edf6;margin-top:16px;padding-top:14px}.related a{display:block;color:#0b4f9f;text-decoration:none;font-weight:800;padding:8px 0;border-bottom:1px solid #f0f3f7}@media(max-width:900px){.resource-layout{grid-template-columns:1fr}.side{position:static}.viewer iframe{height:70vh}}
+</style>
+<div class="resource-layout">
+    <section class="viewer"><iframe src="{{ url_for('static', filename=recurso.pdf) }}" title="{{ recurso.titulo }}"></iframe></section>
+    <aside class="side">
+        <span class="tag">{{ recurso.tipo }}</span><h2>{{ recurso.titulo }}</h2><p><b>{{ recurso.subtitulo }}</b></p><p>{{ recurso.descripcion }}</p><p><b>Responsable:</b> {{ recurso.responsable }}<br><b>Fecha de actualización:</b> {{ recurso.actualizacion }}</p>
+        <div class="actions"><a class="primary" href="{{ url_for('static', filename=recurso.pdf) }}" target="_blank">🔎 Abrir visualización PDF</a><a class="secondary" href="{{ url_for('static', filename=recurso.docx) }}" download>⬇️ Descargar formato en Word</a><a class="secondary" href="{{ url_for('comunicaciones') }}">⬅ Volver a Comunicaciones</a></div>
+        <div class="related"><b>Otros formatos:</b>{% for r in recursos %}{% if r.slug != recurso.slug %}<a href="{{ url_for('ver_recurso_comunicacion', slug=r.slug) }}">{{ r.titulo }}</a>{% endif %}{% endfor %}</div>
+    </aside>
+</div>
+{% endblock %}

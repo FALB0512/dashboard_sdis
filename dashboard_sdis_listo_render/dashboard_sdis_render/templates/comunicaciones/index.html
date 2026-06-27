@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.com-home{max-width:1180px;margin:0 auto}.hero-com{background:linear-gradient(135deg,#0b3a75 0%,#1f7a46 100%);color:#fff;border-radius:26px;padding:34px 36px;box-shadow:0 18px 45px rgba(11,58,117,.20);margin-bottom:28px}.hero-com h1{margin:0 0 14px;font-size:34px;font-weight:900}.hero-com p{font-size:17px;line-height:1.65;max-width:980px;margin:0 0 10px}.button-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}.module-card{background:#fff;border-radius:22px;padding:24px;text-decoration:none;color:#1f2937;box-shadow:0 12px 30px rgba(15,40,70,.10);border:1px solid #edf2f7;transition:.18s ease}.module-card:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(15,40,70,.16)}.module-card .icon{width:58px;height:58px;border-radius:18px;background:#edf6ff;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:15px}.module-card h3{margin:0 0 8px;color:#08356e;font-size:21px;font-weight:900}.module-card p{margin:0;color:#5b6675;line-height:1.5}.note{margin-top:22px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:16px;color:#475569;line-height:1.5}@media(max-width:700px){.hero-com{padding:26px}.hero-com h1{font-size:28px}}
+</style>
+<div class="com-home">
+    <section class="hero-com">
+        <h1>Bienvenido al Módulo de Comunicaciones</h1>
+        <p>En este módulo encontrarás herramientas para mejorar la comunicación documental, consultar términos archivísticos, acceder a guías rápidas, utilizar formatos y registrar acciones de mejora.</p>
+        <p>Este espacio busca facilitar mensajes claros, oportunos y efectivos entre el área de archivo y las diferentes dependencias, contribuyendo a una gestión documental más organizada, eficiente y transparente.</p>
+    </section>
+
+    <section class="button-grid">
+        <a class="module-card" href="{{ url_for('glosario_comunicaciones') }}">
+            <div class="icon">🔤</div><h3>Glosario</h3><p>Consulta términos archivísticos por letra de la A a la Z y visualiza su significado en una ventana flotante.</p>
+        </a>
+        <a class="module-card" href="{{ url_for('ver_poster_comunicacion', slug='iconografia-conservacion-documental') }}">
+            <div class="icon">🗂️</div><h3>Iconografía</h3><p>Visualiza y descarga el póster de Iconografía de conservación documental.</p>
+        </a>
+        <a class="module-card" href="{{ url_for('ver_poster_comunicacion', slug='senalizacion-sst-archivo') }}">
+            <div class="icon">🚧</div><h3>Señalización</h3><p>Visualiza y descarga el póster de Señalización de SST en el archivo.</p>
+        </a>
+        <a class="module-card" href="{{ url_for('ver_poster_comunicacion', slug='simbologia-digital-gestion-documental') }}">
+            <div class="icon">💻</div><h3>Simbología</h3><p>Visualiza y descarga el póster de Simbología digital en la gestión documental.</p>
+        </a>
+        <a class="module-card" href="{{ url_for('ver_recurso_comunicacion', slug='acta-rechazo-tecnico-documental') }}">
+            <div class="icon">📋</div><h3>Protocolo</h3><p>Consulta el Acta de Rechazo Técnico Documental y descarga el formato institucional.</p>
+        </a>
+        <a class="module-card" href="{{ url_for('socializacion_comunicaciones') }}">
+            <div class="icon">📣</div><h3>Socialización</h3><p>Elige entre los pósters Transferencias correctas y La gestión documental comienza en cada dependencia.</p>
+        </a>
+        <a class="module-card" href="{{ url_for('ver_recurso_comunicacion', slug='formato-mejora-comunicativa-phva') }}">
+            <div class="icon">✅</div><h3>Acciones de mejora</h3><p>Consulta y descarga el Formato de Registro y Mejora Comunicativa PHVA.</p>
+        </a>
+    </section>
+
+    <div class="note"><b>Uso recomendado:</b> selecciona el botón de acuerdo con la necesidad del usuario: consulta de términos, revisión de símbolos, descarga de formatos o socialización de buenas prácticas documentales.</div>
+</div>
+{% endblock %}

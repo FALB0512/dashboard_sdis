@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.poster-layout{display:grid;grid-template-columns:minmax(280px,1fr) 360px;gap:24px;align-items:start}.poster-viewer{background:#fff;border-radius:24px;padding:18px;box-shadow:0 12px 35px rgba(15,40,70,.12);text-align:center}.poster-viewer img{max-width:100%;height:auto;border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.14)}.poster-info{background:#fff;border-radius:24px;padding:24px;box-shadow:0 12px 35px rgba(15,40,70,.12);position:sticky;top:20px}.poster-info h2{margin:0 0 10px;color:#08356e;font-size:28px;line-height:1.1}.poster-info p{color:#4d5d70;line-height:1.6}.tag{display:inline-block;background:#e8f5ec;color:#216b36;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:900;margin-bottom:14px}.btn-row{display:flex;flex-direction:column;gap:10px;margin-top:18px}.btn{display:block;text-align:center;text-decoration:none;background:#0b4f9f;color:#fff;padding:12px 14px;border-radius:12px;font-weight:900}.btn.secondary{background:#eef4fb;color:#0b3a75}.related{margin-top:18px;border-top:1px solid #e7edf4;padding-top:16px}.related a{display:block;padding:9px 0;color:#0b4f9f;text-decoration:none;font-weight:800;border-bottom:1px solid #f0f3f7}@media(max-width:900px){.poster-layout{grid-template-columns:1fr}.poster-info{position:static}}
+</style>
+<div class="poster-layout">
+    <section class="poster-viewer"><img src="{{ url_for('static', filename=poster.imagen) }}" alt="{{ poster.titulo }}"></section>
+    <aside class="poster-info">
+        <span class="tag">{{ poster.categoria }}</span>
+        <h2>{{ poster.titulo }}</h2>
+        <p><strong>{{ poster.subtitulo }}</strong></p><p>{{ poster.descripcion }}</p><p><strong>Aplicación:</strong> {{ poster.aplicacion }}</p>
+        <div class="btn-row">
+            <a class="btn" href="{{ url_for('static', filename=poster.imagen) }}" target="_blank">🔎 Ver póster en tamaño completo</a>
+            <a class="btn" href="{{ url_for('static', filename=poster.imagen) }}" download>⬇️ Descargar póster</a>
+            <a class="btn secondary" href="{{ url_for('comunicaciones') }}">⬅ Volver a Comunicaciones</a>
+        </div>
+        <div class="related"><strong>Otros recursos visuales:</strong>{% for p in posters %}{% if p.slug != poster.slug %}<a href="{{ url_for('ver_poster_comunicacion', slug=p.slug) }}">{{ p.titulo }}</a>{% endif %}{% endfor %}</div>
+    </aside>
+</div>
+{% endblock %}

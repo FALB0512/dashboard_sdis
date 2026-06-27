@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.gloss-wrap{max-width:1120px;margin:0 auto}.gloss-head{background:#fff;border-radius:22px;padding:26px;box-shadow:0 12px 32px rgba(15,40,70,.10);margin-bottom:22px}.gloss-head h1{margin:0 0 8px;color:#08356e;font-size:30px}.gloss-head p{margin:0;color:#536273;line-height:1.55}.letters{display:grid;grid-template-columns:repeat(auto-fit,minmax(54px,1fr));gap:10px;background:#fff;border-radius:22px;padding:22px;box-shadow:0 12px 32px rgba(15,40,70,.10)}.letter-btn{border:0;background:#eef6ff;color:#0b4f9f;border-radius:14px;font-size:18px;font-weight:900;padding:14px 0;cursor:pointer}.letter-btn:hover,.letter-btn.active{background:#0b4f9f;color:#fff}.top-actions{margin:18px 0}.top-actions a{text-decoration:none;background:#eef4fb;color:#0b3a75;border-radius:12px;padding:11px 14px;font-weight:900}.modal-bg{display:none;position:fixed;inset:0;background:rgba(2,8,23,.58);z-index:9999;align-items:center;justify-content:center;padding:18px}.modal{width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.35)}.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;background:#0b3a75;color:white;border-radius:24px 24px 0 0}.modal-header h2{margin:0;font-size:24px}.close{border:0;background:rgba(255,255,255,.16);color:white;border-radius:999px;width:38px;height:38px;font-size:22px;cursor:pointer}.modal-body{padding:22px}.term-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.term-btn{border:1px solid #dbe4f0;background:#f8fafc;border-radius:14px;padding:14px;text-align:left;cursor:pointer;font-weight:900;color:#08356e}.term-btn:hover{background:#e8f5ec;color:#216b36}.definition-box{display:none;margin-top:18px;background:#f8fafc;border-left:5px solid #1f7a46;border-radius:14px;padding:18px}.definition-box h3{margin:0 0 10px;color:#08356e}.definition-box p{margin:0;color:#334155;line-height:1.6}.empty{color:#64748b;background:#f8fafc;border-radius:14px;padding:18px}.search{margin-top:14px}.search input{width:100%;padding:13px 14px;border:1px solid #cbd5e1;border-radius:14px;box-sizing:border-box;font-size:15px}
+</style>
+<div class="gloss-wrap">
+    <section class="gloss-head">
+        <h1>Glosario archivístico</h1>
+        <p>Selecciona una letra de la A a la Z. Se abrirá una ventana flotante con las palabras disponibles para esa letra. Al elegir un término, se mostrará su definición técnica.</p>
+        <div class="search"><input id="searchTerm" type="text" placeholder="Buscar término en el glosario..."></div>
+    </section>
+    <div class="top-actions"><a href="{{ url_for('comunicaciones') }}">⬅ Volver a Comunicaciones</a></div>
+    <section class="letters" id="letters"></section>
+</div>
+
+<div class="modal-bg" id="modalBg">
+    <div class="modal">
+        <div class="modal-header"><h2 id="modalTitle">Letra</h2><button class="close" onclick="closeModal()">×</button></div>
+        <div class="modal-body">
+            <div id="termsBox" class="term-list"></div>
+            <div id="definitionBox" class="definition-box"><h3 id="defTitle"></h3><p id="defText"></p></div>
+        </div>
+    </div>
+</div>
+<script>
+const TERMS={{ terminos|tojson }};
+const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const letters=document.getElementById('letters');
+const modal=document.getElementById('modalBg');
+const termsBox=document.getElementById('termsBox');
+const definitionBox=document.getElementById('definitionBox');
+function normalizeText(t){return (t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function termsByLetter(letter){return TERMS.filter(t=>normalizeText(t.termino).startsWith(normalizeText(letter)));}
+alphabet.forEach(l=>{const b=document.createElement('button');b.className='letter-btn';b.textContent=l;b.onclick=()=>openLetter(l);letters.appendChild(b);});
+function openLetter(letter, forcedList=null){
+    document.getElementById('modalTitle').textContent= forcedList ? 'Resultados de búsqueda' : 'Letra '+letter;
+    const list= forcedList || termsByLetter(letter);
+    termsBox.innerHTML=''; definitionBox.style.display='none';
+    if(!list.length){termsBox.innerHTML='<div class="empty">No hay términos registrados para esta letra.</div>';} else {
+        list.forEach(t=>{const b=document.createElement('button');b.className='term-btn';b.textContent=t.termino;b.onclick=()=>showDefinition(t);termsBox.appendChild(b);});
+    }
+    modal.style.display='flex';
+}
+function showDefinition(t){document.getElementById('defTitle').textContent=t.termino;document.getElementById('defText').textContent=t.definicion;definitionBox.style.display='block';definitionBox.scrollIntoView({behavior:'smooth',block:'nearest'});}
+function closeModal(){modal.style.display='none';}
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+document.getElementById('searchTerm').addEventListener('input',e=>{const q=normalizeText(e.target.value.trim());if(q.length>=2){const result=TERMS.filter(t=>normalizeText(t.termino+' '+t.definicion).includes(q));openLetter('',result);}});
+</script>
+{% endblock %}

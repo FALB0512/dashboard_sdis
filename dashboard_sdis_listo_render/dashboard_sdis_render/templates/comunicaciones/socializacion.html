@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.soc-wrap{max-width:1180px;margin:0 auto}.soc-head{background:#fff;border-radius:22px;padding:26px;box-shadow:0 12px 32px rgba(15,40,70,.10);margin-bottom:22px}.soc-head h1{margin:0 0 8px;color:#08356e}.soc-head p{margin:0;color:#536273;line-height:1.55}.soc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:22px}.soc-card{background:#fff;border-radius:24px;padding:18px;box-shadow:0 12px 35px rgba(15,40,70,.12)}.soc-card img{width:100%;border-radius:16px;box-shadow:0 8px 22px rgba(0,0,0,.12)}.soc-card h3{color:#08356e;margin:16px 0 8px}.soc-card p{color:#526071;line-height:1.5}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.actions a{text-decoration:none;border-radius:12px;padding:11px 13px;font-weight:900}.view{background:#0b4f9f;color:#fff}.download{background:#eef4fb;color:#0b3a75}.back{margin:18px 0}.back a{text-decoration:none;background:#eef4fb;color:#0b3a75;border-radius:12px;padding:11px 14px;font-weight:900}
+</style>
+<div class="soc-wrap">
+    <section class="soc-head"><h1>Socialización</h1><p>Elige el póster que deseas consultar. Cada recurso puede visualizarse en pantalla completa y descargarse para su difusión en canales internos.</p></section>
+    <div class="back"><a href="{{ url_for('comunicaciones') }}">⬅ Volver a Comunicaciones</a></div>
+    <section class="soc-grid">
+        {% for poster in posters %}
+        <article class="soc-card"><img src="{{ url_for('static', filename=poster.imagen) }}" alt="{{ poster.titulo }}"><h3>{{ poster.titulo }}</h3><p>{{ poster.descripcion }}</p><div class="actions"><a class="view" href="{{ url_for('ver_poster_comunicacion', slug=poster.slug) }}">👁️ Visualizar</a><a class="download" href="{{ url_for('static', filename=poster.imagen) }}" download>⬇️ Descargar</a></div></article>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}
